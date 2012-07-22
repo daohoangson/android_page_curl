@@ -82,7 +82,7 @@ public class CurlActivity extends Activity {
 
 		@Override
 		public int getPageCount() {
-			return 5;
+			return -1;
 		}
 
 		private Bitmap loadBitmap(int width, int height, int index) {
@@ -126,6 +126,8 @@ public class CurlActivity extends Activity {
 
 		@Override
 		public void updatePage(CurlPage page, int width, int height, int index) {
+			
+			index = index % 5;
 
 			switch (index) {
 			// First case is image on front side, solid colored back.

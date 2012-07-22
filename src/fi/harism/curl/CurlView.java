@@ -270,10 +270,11 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 				}
 				// Otherwise check pointer is on right page's side.
 				else if (mDragStartPos.x >= rightRect.left
-						&& mCurrentIndex < mPageProvider.getPageCount()) {
+						&& (mPageProvider.getPageCount() == -1 || mCurrentIndex < mPageProvider.getPageCount())) {
 					mDragStartPos.x = rightRect.right;
 					if (!mAllowLastPageCurl
-							&& mCurrentIndex >= mPageProvider.getPageCount() - 1) {
+							&& mCurrentIndex >= mPageProvider.getPageCount() - 1
+							&& mPageProvider.getPageCount() != -1) {
 						return false;
 					}
 					startCurl(CURL_RIGHT);
@@ -284,10 +285,11 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 					mDragStartPos.x = rightRect.left;
 					startCurl(CURL_LEFT);
 				} else if (mDragStartPos.x >= halfX
-						&& mCurrentIndex < mPageProvider.getPageCount()) {
+						&& (mPageProvider.getPageCount() == -1 || mCurrentIndex < mPageProvider.getPageCount())) {
 					mDragStartPos.x = rightRect.right;
 					if (!mAllowLastPageCurl
-							&& mCurrentIndex >= mPageProvider.getPageCount() - 1) {
+							&& mCurrentIndex >= mPageProvider.getPageCount() - 1
+							&& mPageProvider.getPageCount() != -1) {
 						return false;
 					}
 					startCurl(CURL_RIGHT);
@@ -442,11 +444,15 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 		if (mPageProvider == null || index < 0) {
 			mCurrentIndex = 0;
 		} else {
-			if (mAllowLastPageCurl) {
-				mCurrentIndex = Math.min(index, mPageProvider.getPageCount());
+			if (mPageProvider.getPageCount() == -1) {
+				mCurrentIndex = index;
 			} else {
-				mCurrentIndex = Math.min(index,
-						mPageProvider.getPageCount() - 1);
+				if (mAllowLastPageCurl) {
+					mCurrentIndex = Math.min(index, mPageProvider.getPageCount());
+				} else {
+					mCurrentIndex = Math.min(index,
+							mPageProvider.getPageCount() - 1);
+				}
 			}
 		}
 		updatePages();
@@ -549,7 +555,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 					mRenderer.addCurlMesh(mPageLeft);
 				}
 			}
-			if (mCurrentIndex < mPageProvider.getPageCount() - 1) {
+			if (mPageProvider.getPageCount() == -1 || mCurrentIndex < mPageProvider.getPageCount() - 1) {
 				updatePage(mPageRight.getTexturePage(), mCurrentIndex + 1);
 				mPageRight.setRect(mRenderer
 						.getPageRect(CurlRenderer.PAGE_RIGHT));
@@ -594,7 +600,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 			}
 
 			// If there is something to show on right page add it to renderer.
-			if (mCurrentIndex < mPageProvider.getPageCount()) {
+			if (mPageProvider.getPageCount() == -1 || mCurrentIndex < mPageProvider.getPageCount()) {
 				mPageRight.setFlipTexture(false);
 				mPageRight.setRect(mRenderer
 						.getPageRect(CurlRenderer.PAGE_RIGHT));
@@ -734,14 +740,14 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 			++rightIdx;
 		}
 
-		if (rightIdx >= 0 && rightIdx < mPageProvider.getPageCount()) {
+		if (rightIdx >= 0 && (mPageProvider.getPageCount() == -1 || rightIdx < mPageProvider.getPageCount())) {
 			updatePage(mPageRight.getTexturePage(), rightIdx);
 			mPageRight.setFlipTexture(false);
 			mPageRight.setRect(mRenderer.getPageRect(CurlRenderer.PAGE_RIGHT));
 			mPageRight.reset();
 			mRenderer.addCurlMesh(mPageRight);
 		}
-		if (leftIdx >= 0 && leftIdx < mPageProvider.getPageCount()) {
+		if (leftIdx >= 0 && (mPageProvider.getPageCount() == -1 || leftIdx < mPageProvider.getPageCount())) {
 			updatePage(mPageLeft.getTexturePage(), leftIdx);
 			mPageLeft.setFlipTexture(true);
 			mPageLeft.setRect(mRenderer.getPageRect(CurlRenderer.PAGE_LEFT));
@@ -750,7 +756,7 @@ public class CurlView extends GLSurfaceView implements View.OnTouchListener,
 				mRenderer.addCurlMesh(mPageLeft);
 			}
 		}
-		if (curlIdx >= 0 && curlIdx < mPageProvider.getPageCount()) {
+		if (curlIdx >= 0 && (mPageProvider.getPageCount() == -1 || curlIdx < mPageProvider.getPageCount())) {
 			updatePage(mPageCurl.getTexturePage(), curlIdx);
 
 			if (mCurlState == CURL_RIGHT) {
